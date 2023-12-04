@@ -21,22 +21,10 @@
 package me.lucko.spark.common.util;
 
 import com.google.common.base.Strings;
-
 import me.lucko.spark.api.statistic.misc.DoubleAverageInfo;
-
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.TextColor;
 
 import java.lang.management.MemoryUsage;
 import java.util.Locale;
-
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
-import static net.kyori.adventure.text.format.NamedTextColor.RED;
-import static net.kyori.adventure.text.format.NamedTextColor.YELLOW;
 
 public enum StatisticFormatter {
     ;
@@ -44,83 +32,73 @@ public enum StatisticFormatter {
     private static final String BAR_TRUE_CHARACTER = "┃";
     private static final String BAR_FALSE_CHARACTER = "╻";
 
-    public static TextComponent formatTps(double tps) {
-        TextColor color;
-        if (tps > 18.0) {
-            color = GREEN;
-        } else if (tps > 16.0) {
-            color = YELLOW;
+    public static String formatTps(double tps) {
+        String color;
+        if (tps > 50.0) {
+            color = "[acid]";
+        } else if (tps > 30.0) {
+            color = "[yellow]";
         } else {
-            color = RED;
+            color = "[red]";
         }
 
-        return text((tps > 20.0 ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 20.0), color);
+        return color + (tps > 60.0 ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 60.0);
     }
 
-    public static TextComponent formatTickDurations(DoubleAverageInfo average) {
-        return text()
-                .append(formatTickDuration(average.min()))
-                .append(text('/', GRAY))
-                .append(formatTickDuration(average.median()))
-                .append(text('/', GRAY))
-                .append(formatTickDuration(average.percentile95th()))
-                .append(text('/', GRAY))
-                .append(formatTickDuration(average.max()))
-                .build();
+    public static String formatTickDurations(DoubleAverageInfo average) {
+        return formatTickDuration(average.min()) + "/" +
+                formatTickDuration(average.median()) + "/" +
+                formatTickDuration(average.percentile95th()) + "/" +
+                formatTickDuration(average.max());
     }
 
-    public static TextComponent formatTickDuration(double duration) {
-        TextColor color;
+    public static String formatTickDuration(double duration) {
+        String color;
         if (duration >= 50d) {
-            color = RED;
+            color = "[red]";
         } else if (duration >= 40d) {
-            color = YELLOW;
+            color = "[yellow]";
         } else {
-            color = GREEN;
+            color = "[acid]";
         }
 
-        return text(String.format(Locale.ENGLISH, "%.1f", duration), color);
+        return color + String.format(Locale.ENGLISH, "%.1f", duration);
     }
 
-    public static TextComponent formatCpuUsage(double usage) {
-        TextColor color;
+    public static String formatCpuUsage(double usage) {
+        String color;
         if (usage > 0.9) {
-            color = RED;
+            color = "[red]";
         } else if (usage > 0.65) {
-            color = YELLOW;
+            color = "[yellow]";
         } else {
-            color = GREEN;
+            color = "[acid]";
         }
 
-        return text(FormatUtil.percent(usage, 1d), color);
+        return color + FormatUtil.percent(usage, 1d);
     }
 
-    public static TextComponent formatPingRtts(double min, double median, double percentile95th, double max) {
-        return text()
-                .append(formatPingRtt(min))
-                .append(text('/', GRAY))
-                .append(formatPingRtt(median))
-                .append(text('/', GRAY))
-                .append(formatPingRtt(percentile95th))
-                .append(text('/', GRAY))
-                .append(formatPingRtt(max))
-                .build();
+    public static String formatPingRtts(double min, double median, double percentile95th, double max) {
+        return formatPingRtt(min) + "/" +
+                formatPingRtt(median) + "/" +
+                formatPingRtt(percentile95th) + "/" +
+                formatPingRtt(max);
     }
 
-    public static TextComponent formatPingRtt(double ping) {
-        TextColor color;
+    public static String formatPingRtt(double ping) {
+        String color;
         if (ping >= 200) {
-            color = RED;
+            color = "[red]";
         } else if (ping >= 100) {
-            color = YELLOW;
+            color = "[yellow]";
         } else {
-            color = GREEN;
+            color = "[acid]";
         }
 
-        return text((int) Math.ceil(ping), color);
+        return color + (int) Math.ceil(ping);
     }
 
-    public static TextComponent generateMemoryUsageDiagram(MemoryUsage usage, int length) {
+    public static String generateMemoryUsageDiagram(MemoryUsage usage, int length) {
         double used = usage.getUsed();
         double committed = usage.getCommitted();
         double max = usage.getMax();
@@ -128,23 +106,19 @@ public enum StatisticFormatter {
         int usedChars = (int) ((used * length) / max);
         int committedChars = (int) ((committed * length) / max);
 
-        TextComponent.Builder line = text().content(Strings.repeat(BAR_TRUE_CHARACTER, usedChars)).color(YELLOW);
+        String line = Strings.repeat(BAR_TRUE_CHARACTER, usedChars);
         if (committedChars > usedChars) {
-            line.append(text(Strings.repeat(BAR_FALSE_CHARACTER, (committedChars - usedChars) - 1), GRAY));
-            line.append(Component.text(BAR_FALSE_CHARACTER, RED));
+            line += Strings.repeat(BAR_FALSE_CHARACTER, (committedChars - usedChars) - 1);
+            line += BAR_FALSE_CHARACTER;
         }
         if (length > committedChars) {
-            line.append(text(Strings.repeat(BAR_FALSE_CHARACTER, (length - committedChars)), GRAY));
+            line += Strings.repeat(BAR_FALSE_CHARACTER, (length - committedChars));
         }
 
-        return text()
-                .append(text("[", DARK_GRAY))
-                .append(line.build())
-                .append(text("]", DARK_GRAY))
-                .build();
+        return "[gray][" + line + "[gray]]";
     }
 
-    public static TextComponent generateMemoryPoolDiagram(MemoryUsage usage, MemoryUsage collectionUsage, int length) {
+    public static String generateMemoryPoolDiagram(MemoryUsage usage, MemoryUsage collectionUsage, int length) {
         double used = usage.getUsed();
         double collectionUsed = used;
         if (collectionUsage != null) {
@@ -157,35 +131,27 @@ public enum StatisticFormatter {
         int collectionUsedChars = (int) ((collectionUsed * length) / max);
         int committedChars = (int) ((committed * length) / max);
 
-        TextComponent.Builder line = text().content(Strings.repeat(BAR_TRUE_CHARACTER, collectionUsedChars)).color(YELLOW);
+        String line = Strings.repeat(BAR_TRUE_CHARACTER, collectionUsedChars);
 
         if (usedChars > collectionUsedChars) {
-            line.append(Component.text(BAR_TRUE_CHARACTER, RED));
-            line.append(text(Strings.repeat(BAR_TRUE_CHARACTER, (usedChars - collectionUsedChars) - 1), YELLOW));
+            line += BAR_TRUE_CHARACTER;
+            line += Strings.repeat(BAR_TRUE_CHARACTER, (usedChars - collectionUsedChars) - 1);
         }
         if (committedChars > usedChars) {
-            line.append(text(Strings.repeat(BAR_FALSE_CHARACTER, (committedChars - usedChars) - 1), GRAY));
-            line.append(Component.text(BAR_FALSE_CHARACTER, YELLOW));
+            line += Strings.repeat(BAR_FALSE_CHARACTER, (committedChars - usedChars) - 1);
+            line += BAR_FALSE_CHARACTER;
         }
         if (length > committedChars) {
-            line.append(text(Strings.repeat(BAR_FALSE_CHARACTER, (length - committedChars)), GRAY));
+            line += Strings.repeat(BAR_FALSE_CHARACTER, (length - committedChars));
         }
 
-        return text()
-                .append(text("[", DARK_GRAY))
-                .append(line.build())
-                .append(text("]", DARK_GRAY))
-                .build();
+        return "[" + line + "]";
     }
 
-    public static TextComponent generateDiskUsageDiagram(double used, double max, int length) {
+    public static String generateDiskUsageDiagram(double used, double max, int length) {
         int usedChars = (int) ((used * length) / max);
         int freeChars = length - usedChars;
-        return text()
-                .append(text("[", DARK_GRAY))
-                .append(text(Strings.repeat(BAR_TRUE_CHARACTER, usedChars), YELLOW))
-                .append(text(Strings.repeat(BAR_FALSE_CHARACTER, freeChars), GRAY))
-                .append(text("]", DARK_GRAY))
-                .build();
+        return "[dgray][" + Strings.repeat(BAR_TRUE_CHARACTER, usedChars) + "][yellow]" +
+                Strings.repeat(BAR_FALSE_CHARACTER, freeChars) + "[gray]]";
     }
 }

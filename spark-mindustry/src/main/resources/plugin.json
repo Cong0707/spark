@@ -1,0 +1,7 @@
+{
+  "name": "MindustrySparkPlugin",
+  "author": "cong",
+  "main": "io.github.cong.MindustrySparkPlugin",
+  "description": "A plugin to use spark",
+  "version": 1.0
+}

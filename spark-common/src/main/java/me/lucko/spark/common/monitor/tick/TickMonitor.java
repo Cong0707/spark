@@ -21,23 +21,12 @@
 package me.lucko.spark.common.monitor.tick;
 
 import com.sun.management.GarbageCollectionNotificationInfo;
-
 import me.lucko.spark.common.SparkPlatform;
 import me.lucko.spark.common.monitor.memory.GarbageCollectionMonitor;
 import me.lucko.spark.common.tick.TickHook;
 
-import net.kyori.adventure.text.Component;
-
 import java.text.DecimalFormat;
 import java.util.DoubleSummaryStatistics;
-
-import static net.kyori.adventure.text.Component.space;
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.GOLD;
-import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.RED;
-import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
 
 /**
  * Monitoring process for the server/client tick rate.
@@ -93,7 +82,7 @@ public abstract class TickMonitor implements TickHook.Callback, GarbageCollectio
         return this.tickHook.getCurrentTick() - this.zeroTick;
     }
 
-    protected abstract void sendMessage(Component message);
+    protected abstract void sendMessage(String message);
 
     public void start() {
         this.tickHook.addCallback(this);
@@ -116,8 +105,8 @@ public abstract class TickMonitor implements TickHook.Callback, GarbageCollectio
         if (this.phase == null) {
             this.phase = Phase.SETUP;
             this.lastTickTime = now;
-            sendMessage(text("Tick monitor started. Before the monitor becomes fully active, the server's " +
-                    "average tick rate will be calculated over a period of 120 ticks (approx 6 seconds)."));
+            sendMessage("Tick monitor started. Before the monitor becomes fully active, the server's " +
+                    "average tick rate will be calculated over a period of 120 ticks (approx 6 seconds).");
             return;
         }
 
@@ -137,34 +126,10 @@ public abstract class TickMonitor implements TickHook.Callback, GarbageCollectio
             // move onto the next state
             if (this.averageTickTimeCalc.getCount() >= 120) {
                 this.platform.getPlugin().executeAsync(() -> {
-                    sendMessage(text("Analysis is now complete.", GOLD));
-                    sendMessage(text()
-                            .color(GRAY)
-                            .append(text(">", WHITE))
-                            .append(space())
-                            .append(text("Max: "))
-                            .append(text(DF.format(this.averageTickTimeCalc.getMax())))
-                            .append(text("ms"))
-                            .build()
-                    );
-                    sendMessage(text()
-                            .color(GRAY)
-                            .append(text(">", WHITE))
-                            .append(space())
-                            .append(text("Min: "))
-                            .append(text(DF.format(this.averageTickTimeCalc.getMin())))
-                            .append(text("ms"))
-                            .build()
-                    );
-                    sendMessage(text()
-                            .color(GRAY)
-                            .append(text(">", WHITE))
-                            .append(space())
-                            .append(text("Average: "))
-                            .append(text(DF.format(this.averageTickTimeCalc.getAverage())))
-                            .append(text("ms"))
-                            .build()
-                    );
+                    sendMessage("[gold]Analysis is now complete.");
+                    sendMessage("[gray]> [white]Max: [gray]" + DF.format(this.averageTickTimeCalc.getMax()) + "ms");
+                    sendMessage("[gray]> [white]Min: [gray]" + DF.format(this.averageTickTimeCalc.getMin()) + "ms");
+                    sendMessage("[gray]> [white]Average: [gray]" + DF.format(this.averageTickTimeCalc.getAverage()) + "ms");
                     sendMessage(this.reportPredicate.monitoringStartMessage());
                 });
 
@@ -178,18 +143,8 @@ public abstract class TickMonitor implements TickHook.Callback, GarbageCollectio
             double percentageChange = (increase * 100d) / this.averageTickTime;
             if (this.reportPredicate.shouldReport(tickDuration, increase, percentageChange)) {
                 this.platform.getPlugin().executeAsync(() -> {
-                    sendMessage(text()
-                            .color(GRAY)
-                            .append(text("Tick "))
-                            .append(text("#" + getCurrentTick(), DARK_GRAY))
-                            .append(text(" lasted "))
-                            .append(text(DF.format(tickDuration), GOLD))
-                            .append(text(" ms. "))
-                            .append(text("("))
-                            .append(text(DF.format(percentageChange) + "%", GOLD))
-                            .append(text(" increase from avg)"))
-                            .build()
-                    );
+                    sendMessage("[gray]Tick [dark_gray]#" + getCurrentTick() + "[gray] lasted [gold]" + DF.format(tickDuration) +
+                            " ms. ([gold]" + DF.format(percentageChange) + "%[gold] increase from avg)");
                 });
             }
         }
@@ -204,17 +159,8 @@ public abstract class TickMonitor implements TickHook.Callback, GarbageCollectio
         }
 
         this.platform.getPlugin().executeAsync(() -> {
-            sendMessage(text()
-                    .color(GRAY)
-                    .append(text("Tick "))
-                    .append(text("#" + getCurrentTick(), DARK_GRAY))
-                    .append(text(" included "))
-                    .append(text("GC", RED))
-                    .append(text(" lasting "))
-                    .append(text(DF.format(data.getGcInfo().getDuration()), GOLD))
-                    .append(text(" ms. (type = " + GarbageCollectionMonitor.getGcType(data) + ")"))
-                    .build()
-            );
+            sendMessage("[gray]Tick [dark_gray]#" + getCurrentTick() + "[gray] included [red]GC[gray] lasting [gold]" +
+                    DF.format(data.getGcInfo().getDuration()) + " ms. (type = " + GarbageCollectionMonitor.getGcType(data) + ")");
         });
     }
 

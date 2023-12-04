@@ -21,7 +21,6 @@
 package me.lucko.spark.common;
 
 import me.lucko.spark.api.Spark;
-import me.lucko.spark.common.command.sender.CommandSender;
 import me.lucko.spark.common.monitor.ping.PlayerPingProvider;
 import me.lucko.spark.common.monitor.tick.TickStatistics;
 import me.lucko.spark.common.platform.MetadataProvider;
@@ -33,6 +32,8 @@ import me.lucko.spark.common.sampler.source.ClassSourceLookup;
 import me.lucko.spark.common.sampler.source.SourceMetadata;
 import me.lucko.spark.common.tick.TickHook;
 import me.lucko.spark.common.tick.TickReporter;
+import mindustry.entities.EntityGroup;
+import mindustry.gen.Player;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -71,7 +72,7 @@ public interface SparkPlugin {
      *
      * @return the stream of command senders
      */
-    Stream<? extends CommandSender> getCommandSenders();
+    EntityGroup<Player> getCommandSenders();
 
     /**
      * Executes the given {@link Runnable} asynchronously using the plugins scheduler.

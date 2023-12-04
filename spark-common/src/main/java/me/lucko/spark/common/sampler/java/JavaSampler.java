@@ -193,7 +193,7 @@ public class JavaSampler extends AbstractSampler implements Runnable {
         if (exportProps.channelInfo() != null) {
             proto.setChannelInfo(exportProps.channelInfo());
         }
-        writeMetadataToProto(proto, platform, exportProps.creator(), exportProps.comment(), this.dataAggregator);
+        writeMetadataToProto(proto, platform, exportProps.creator(), exportProps.comment(), this.dataAggregator);//TODO
         writeDataToProto(proto, this.dataAggregator, exportProps.mergeMode().get(), exportProps.classSourceLookup().get());
         return proto.build();
     }

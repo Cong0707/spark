@@ -20,8 +20,8 @@
 
 package me.lucko.spark.common.sampler;
 
+import me.lucko.spark.common.Data;
 import me.lucko.spark.common.SparkPlatform;
-import me.lucko.spark.common.command.sender.CommandSender;
 import me.lucko.spark.common.monitor.memory.GarbageCollectorStatistics;
 import me.lucko.spark.common.platform.MetadataProvider;
 import me.lucko.spark.common.platform.serverconfig.ServerConfigProvider;
@@ -36,6 +36,7 @@ import me.lucko.spark.common.ws.ViewerSocket;
 import me.lucko.spark.proto.SparkProtos;
 import me.lucko.spark.proto.SparkSamplerProtos.SamplerData;
 import me.lucko.spark.proto.SparkSamplerProtos.SamplerMetadata;
+import mindustry.gen.Player;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -172,7 +173,7 @@ public abstract class AbstractSampler implements Sampler {
         }
     }
 
-    protected void writeMetadataToProto(SamplerData.Builder proto, SparkPlatform platform, CommandSender.Data creator, String comment, DataAggregator dataAggregator) {
+    protected void writeMetadataToProto(SamplerData.Builder proto,  SparkPlatform platform, Data creator, String comment, DataAggregator dataAggregator) {
         SamplerMetadata.Builder metadata = SamplerMetadata.newBuilder()
                 .setSamplerMode(getMode().asProto())
                 .setPlatformMetadata(platform.getPlugin().getPlatformInfo().toData().toProto())

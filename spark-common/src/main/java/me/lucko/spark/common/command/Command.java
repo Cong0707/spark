@@ -21,20 +21,12 @@
 package me.lucko.spark.common.command;
 
 import com.google.common.collect.ImmutableList;
-
 import me.lucko.spark.common.SparkPlatform;
-import me.lucko.spark.common.command.sender.CommandSender;
-
-import net.kyori.adventure.text.Component;
+import mindustry.gen.Player;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import static net.kyori.adventure.text.Component.space;
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
 
 public class Command {
 
@@ -138,7 +130,7 @@ public class Command {
 
     @FunctionalInterface
     public interface Executor {
-        void execute(SparkPlatform platform, CommandSender sender, CommandResponseHandler resp, Arguments arguments);
+        void execute(SparkPlatform platform, Player sender, CommandResponseHandler resp, Arguments arguments);
     }
 
     @FunctionalInterface
@@ -147,7 +139,7 @@ public class Command {
             return (platform, sender, arguments) -> Collections.emptyList();
         }
 
-        List<String> completions(SparkPlatform platform, CommandSender sender, List<String> arguments);
+        List<String> completions(SparkPlatform platform, Player sender, List<String> arguments);
     }
 
     public static final class ArgumentInfo {
@@ -177,23 +169,11 @@ public class Command {
             return this.parameterDescription != null;
         }
 
-        public Component toComponent(String padding) {
+        public String toString(String padding) {
             if (requiresParameter()) {
-                 return text()
-                        .content(padding)
-                        .append(text("[", DARK_GRAY))
-                        .append(text("--" + argumentName(), GRAY))
-                        .append(space())
-                        .append(text("<" + parameterDescription() + ">", DARK_GRAY))
-                        .append(text("]", DARK_GRAY))
-                        .build();
+                 return padding + "[gray][--" + argumentName() + " [gray]<" + parameterDescription() + ">[gray]]";
             } else {
-                return text()
-                        .content(padding)
-                        .append(text("[", DARK_GRAY))
-                        .append(text("--" + argumentName(), GRAY))
-                        .append(text("]", DARK_GRAY))
-                        .build();
+                return padding + "[gray][--" + argumentName() + "][gray]";
             }
         }
     }

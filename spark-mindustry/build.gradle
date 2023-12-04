@@ -1,0 +1,36 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+repositories{
+    mavenCentral()
+    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven{ url 'https://www.jitpack.io' }
+}
+
+ext{
+    //the build number that this plugin is made for
+    mindustryVersion = 'v145'
+    jabelVersion = "93fde537c7"
+}
+
+
+dependencies{
+    implementation project(':spark-common')
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+}
+
+shadowJar {
+    archiveFileName = "spark-${project.pluginVersion}-mdt.jar"
+
+    from(sourceSets.main.resources.srcDirs){
+        include "plugin.json"
+    }
+}
+
+artifacts {
+    archives shadowJar
+    shadow shadowJar
+}
+
