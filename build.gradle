@@ -2,11 +2,6 @@ plugins {
     id 'org.cadixdev.licenser' version '0.6.1' apply false
 }
 
-allprojects {
-    group = 'me.lucko'
-    version = '1.10-SNAPSHOT'
-}
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -15,23 +10,18 @@ subprojects {
 
     ext {
         baseVersion = '1.10'
-        patchVersion = determinePatchVersion()
+        patchVersion = '1'
         pluginVersion = baseVersion + '.' + patchVersion
-        pluginDescription = 'spark is a performance profiling plugin/mod for Minecraft clients, servers and proxies.'
+        pluginDescription = 'spark is a performance profiling plugin/mod for clients, servers and proxies.'
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        options.release = 8
+        options.compilerArgs.addAll(['--release', '8'])
     }
 
     processResources {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
-    }
-
-    license {
-        header = rootProject.file('HEADER.txt')
-        include '**/*.java'
     }
 
     repositories {
@@ -41,15 +31,4 @@ subprojects {
         maven { url "https://jitpack.io" }
     }
 
-}
-
-def determinePatchVersion() {
-    def tagInfo = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags'
-        standardOutput = tagInfo
-    }
-    tagInfo = tagInfo.toString()
-
-    return tagInfo.contains('-') ? tagInfo.split("-")[1] : 0
 }

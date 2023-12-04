@@ -20,8 +20,6 @@
 
 package me.lucko.spark.common.monitor.tick;
 
-import net.kyori.adventure.text.Component;
-
 /**
  * A predicate to test whether a tick should be reported.
  */
@@ -42,7 +40,7 @@ public interface ReportPredicate {
      *
      * @return the component
      */
-    Component monitoringStartMessage();
+    String monitoringStartMessage();
 
     final class PercentageChangeGt implements ReportPredicate {
         private final double threshold;
@@ -60,9 +58,9 @@ public interface ReportPredicate {
         }
 
         @Override
-        public Component monitoringStartMessage() {
-            return Component.text("Starting now, any ticks with >" + this.threshold + "% increase in " +
-                    "duration compared to the average will be reported.");
+        public String monitoringStartMessage() {
+            return "Starting now, any ticks with >" + this.threshold + "% increase in " +
+                    "duration compared to the average will be reported.";
         }
     }
 
@@ -82,8 +80,8 @@ public interface ReportPredicate {
         }
 
         @Override
-        public Component monitoringStartMessage() {
-            return Component.text("Starting now, any ticks with duration >" + this.threshold + " will be reported.");
+        public String monitoringStartMessage() {
+            return "Starting now, any ticks with duration >" + this.threshold + " will be reported.";
         }
     }
 

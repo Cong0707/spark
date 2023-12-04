@@ -24,17 +24,11 @@ import me.lucko.spark.common.SparkPlatform;
 import me.lucko.spark.common.command.Command;
 import me.lucko.spark.common.command.CommandModule;
 import me.lucko.spark.common.command.CommandResponseHandler;
-import me.lucko.spark.common.command.tabcomplete.TabCompleter;
 import me.lucko.spark.common.monitor.tick.ReportPredicate;
 import me.lucko.spark.common.monitor.tick.TickMonitor;
 import me.lucko.spark.common.tick.TickHook;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-
 import java.util.function.Consumer;
-
-import static net.kyori.adventure.text.Component.text;
 
 public class TickMonitoringModule implements CommandModule {
 
@@ -59,7 +53,7 @@ public class TickMonitoringModule implements CommandModule {
                 .executor((platform, sender, resp, arguments) -> {
                     TickHook tickHook = platform.getTickHook();
                     if (tickHook == null) {
-                        resp.replyPrefixed(text("Not supported!", NamedTextColor.RED));
+                        resp.replyPrefixed("[red]Not supported!");
                         return;
                     }
 
@@ -79,10 +73,9 @@ public class TickMonitoringModule implements CommandModule {
                         this.activeTickMonitor.start();
                     } else {
                         close();
-                        resp.broadcastPrefixed(text("Tick monitor disabled."));
+                        resp.broadcastPrefixed("Tick monitor disabled.");
                     }
                 })
-                .tabCompleter((platform, sender, arguments) -> TabCompleter.completeForOpts(arguments, "--threshold", "--threshold-tick", "--without-gc"))
                 .build()
         );
     }
@@ -96,7 +89,7 @@ public class TickMonitoringModule implements CommandModule {
         }
 
         @Override
-        protected void sendMessage(Component message) {
+        protected void sendMessage(String message) {
             this.resp.broadcastPrefixed(message);
         }
     }

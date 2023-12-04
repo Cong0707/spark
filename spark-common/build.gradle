@@ -8,10 +8,22 @@ license {
     exclude '**/sampler/async/jfr/**'
 }
 
+repositories{
+    mavenCentral()
+    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven{ url 'https://www.jitpack.io' }
+}
+
 extensions.configure(LicenseExtension.class) {
     it.exclude {
         it.file.toString().startsWith(buildDir.toString())
     }
+}
+
+ext{
+    //the build number that this plugin is made for
+    mindustryVersion = 'v145'
+    jabelVersion = "93fde537c7"
 }
 
 dependencies {
@@ -24,27 +36,15 @@ dependencies {
     implementation('me.lucko:bytesocks-java-client:1.0-20230828.145440-5') {
         exclude(module: 'slf4j-api')
     }
+    implementation 'com.google.code.gson:gson:2.7'
+    implementation 'com.google.guava:guava:19.0'
+    implementation 'org.checkerframework:checker-qual:3.8.0'
 
-    api('net.kyori:adventure-api:4.13.1') {
-        exclude(module: 'adventure-bom')
-        exclude(module: 'checker-qual')
-        exclude(module: 'annotations')
-    }
-    api('net.kyori:adventure-text-serializer-gson:4.13.1') {
-        exclude(module: 'adventure-bom')
-        exclude(module: 'adventure-api')
-        exclude(module: 'gson')
-    }
-    api('net.kyori:adventure-text-serializer-legacy:4.13.1') {
-        exclude(module: 'adventure-bom')
-        exclude(module: 'adventure-api')
-    }
-    implementation('net.kyori:adventure-text-feature-pagination:4.0.0-SNAPSHOT') {
-        exclude(module: 'adventure-api')
-    }
-    compileOnly 'com.google.code.gson:gson:2.7'
-    compileOnly 'com.google.guava:guava:19.0'
-    compileOnly 'org.checkerframework:checker-qual:3.8.0'
+    implementation 'org.slf4j:slf4j-api:1.7.32'
+    implementation 'org.slf4j:slf4j-simple:1.7.32'
+
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 }
 
 protobuf {

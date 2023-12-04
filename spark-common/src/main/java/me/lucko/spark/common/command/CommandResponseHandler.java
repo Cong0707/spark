@@ -20,100 +20,58 @@
 
 package me.lucko.spark.common.command;
 
+import arc.util.Log;
 import me.lucko.spark.common.SparkPlatform;
-import me.lucko.spark.common.command.sender.CommandSender;
+import mindustry.entities.EntityGroup;
+import mindustry.gen.Groups;
+import mindustry.gen.Player;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.TextComponent;
-
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.YELLOW;
-import static net.kyori.adventure.text.format.TextDecoration.BOLD;
 
 public class CommandResponseHandler {
 
     /** The prefix used in all messages "&8[&e&l⚡&8] &7" */
-    private static final TextComponent PREFIX = text()
-            .color(GRAY)
-            .append(text("[", DARK_GRAY))
-            .append(text("⚡", YELLOW, BOLD))
-            .append(text("]", DARK_GRAY))
-            .append(text(" "))
-            .build();
+    private static final String PREFIX = "[gray][[[yellow]⚡[gray]][white] ";
 
     private final SparkPlatform platform;
-    private final CommandSender sender;
-    private String commandPrimaryAlias;
+    private final Player sender;
 
-    public CommandResponseHandler(SparkPlatform platform, CommandSender sender) {
+    public CommandResponseHandler(SparkPlatform platform, Player sender) {
         this.platform = platform;
         this.sender = sender;
     }
 
-    public void setCommandPrimaryAlias(String commandPrimaryAlias) {
-        this.commandPrimaryAlias = commandPrimaryAlias;
-    }
-
-    public CommandSender sender() {
+    public Player sender() {
         return this.sender;
     }
 
-    public void allSenders(Consumer<? super CommandSender> action) {
-        if (this.commandPrimaryAlias == null) {
-            throw new IllegalStateException("Command alias has not been set!");
+    public void reply(String message) {
+        if (sender == null){
+            Log.info(message);
+        }else{
+            this.sender.sendMessage(message);
         }
-
-        Set<CommandSender> senders = this.platform.getPlugin().getCommandSenders()
-                .filter(s -> s.hasPermission("spark") || s.hasPermission("spark." + this.commandPrimaryAlias))
-                .collect(Collectors.toSet());
-
-        senders.add(this.sender);
-        senders.forEach(action);
     }
 
-    public void reply(Component message) {
-        this.sender.sendMessage(message);
-    }
-
-    public void reply(Iterable<Component> message) {
-        Component joinedMsg = Component.join(JoinConfiguration.separator(Component.newline()), message);
-        this.sender.sendMessage(joinedMsg);
-    }
-
-    public void broadcast(Component message) {
+    public void broadcast(String message) {
         if (this.platform.shouldBroadcastResponse()) {
-            allSenders(sender -> sender.sendMessage(message));
+            Groups.player.forEach(player -> player.sendMessage(message));
+            Log.info(message);
         } else {
             reply(message);
         }
     }
 
-    public void broadcast(Iterable<Component> message) {
-        if (this.platform.shouldBroadcastResponse()) {
-            Component joinedMsg = Component.join(JoinConfiguration.separator(Component.newline()), message);
-            allSenders(sender -> sender.sendMessage(joinedMsg));
-        } else {
-            reply(message);
-        }
-    }
-
-    public void replyPrefixed(Component message) {
+    public void replyPrefixed(String message) {
         reply(applyPrefix(message));
     }
 
-    public void broadcastPrefixed(Component message) {
+    public void broadcastPrefixed(String message) {
         broadcast(applyPrefix(message));
     }
 
-    public static Component applyPrefix(Component message) {
-        return PREFIX.append(message);
+    public static String applyPrefix(String message) {
+        return PREFIX + message;
     }
 
 }

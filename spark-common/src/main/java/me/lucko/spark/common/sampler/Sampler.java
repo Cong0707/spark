@@ -20,13 +20,14 @@
 
 package me.lucko.spark.common.sampler;
 
+import me.lucko.spark.common.Data;
 import me.lucko.spark.common.SparkPlatform;
-import me.lucko.spark.common.command.sender.CommandSender;
 import me.lucko.spark.common.sampler.node.MergeMode;
 import me.lucko.spark.common.sampler.source.ClassSourceLookup;
 import me.lucko.spark.common.ws.ViewerSocket;
 import me.lucko.spark.proto.SparkSamplerProtos.SamplerData;
 import me.lucko.spark.proto.SparkSamplerProtos.SocketChannelInfo;
+import mindustry.gen.Player;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -100,7 +101,7 @@ public interface Sampler {
     SamplerData toProto(SparkPlatform platform, ExportProps exportProps);
 
     final class ExportProps {
-        private CommandSender.Data creator;
+        private Data creator;
         private String comment;
         private Supplier<MergeMode> mergeMode;
         private Supplier<ClassSourceLookup> classSourceLookup;
@@ -109,10 +110,9 @@ public interface Sampler {
         public ExportProps() {
         }
 
-        public CommandSender.Data creator() {
+        public Data creator() {
             return this.creator;
         }
-
         public String comment() {
             return this.comment;
         }
@@ -129,13 +129,13 @@ public interface Sampler {
             return this.channelInfo;
         }
 
-        public ExportProps creator(CommandSender.Data creator) {
-            this.creator = creator;
+        public ExportProps comment(String comment) {
+            this.comment = comment;
             return this;
         }
 
-        public ExportProps comment(String comment) {
-            this.comment = comment;
+        public ExportProps creator(Data creator) {
+            this.creator = creator;
             return this;
         }
 

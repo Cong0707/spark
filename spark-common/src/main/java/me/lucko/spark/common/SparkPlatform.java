@@ -22,6 +22,9 @@ package me.lucko.spark.common;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import me.lucko.bytesocks.client.BytesocksClient;
 import me.lucko.spark.common.activitylog.ActivityLog;
 import me.lucko.spark.common.api.SparkApi;
@@ -29,15 +32,7 @@ import me.lucko.spark.common.command.Arguments;
 import me.lucko.spark.common.command.Command;
 import me.lucko.spark.common.command.CommandModule;
 import me.lucko.spark.common.command.CommandResponseHandler;
-import me.lucko.spark.common.command.modules.ActivityLogModule;
-import me.lucko.spark.common.command.modules.GcMonitoringModule;
-import me.lucko.spark.common.command.modules.HealthModule;
-import me.lucko.spark.common.command.modules.HeapAnalysisModule;
-import me.lucko.spark.common.command.modules.SamplerModule;
-import me.lucko.spark.common.command.modules.TickMonitoringModule;
-import me.lucko.spark.common.command.sender.CommandSender;
-import me.lucko.spark.common.command.tabcomplete.CompletionSupplier;
-import me.lucko.spark.common.command.tabcomplete.TabCompleter;
+import me.lucko.spark.common.command.modules.*;
 import me.lucko.spark.common.monitor.cpu.CpuMonitor;
 import me.lucko.spark.common.monitor.memory.GarbageCollectorStatistics;
 import me.lucko.spark.common.monitor.net.NetworkMonitor;
@@ -55,33 +50,20 @@ import me.lucko.spark.common.util.BytebinClient;
 import me.lucko.spark.common.util.Configuration;
 import me.lucko.spark.common.util.TemporaryFiles;
 import me.lucko.spark.common.ws.TrustedKeyStore;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
+import me.lucko.spark.proto.SparkProtos;
+import mindustry.gen.Player;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
-import static net.kyori.adventure.text.Component.space;
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.format.NamedTextColor.GOLD;
-import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
-import static net.kyori.adventure.text.format.NamedTextColor.RED;
-import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
-import static net.kyori.adventure.text.format.TextDecoration.BOLD;
 
 /**
  * Abstract spark implementation used by all platforms.
@@ -135,8 +117,7 @@ public class SparkPlatform {
                 new HealthModule(),
                 new TickMonitoringModule(),
                 new GcMonitoringModule(),
-                new HeapAnalysisModule(),
-                new ActivityLogModule()
+                new HeapAnalysisModule()
         );
 
         ImmutableList.Builder<Command> commandsBuilder = ImmutableList.builder();
@@ -310,20 +291,7 @@ public class SparkPlatform {
         return pluginFolder.resolve(prefix + "-" + DATE_TIME_FORMATTER.format(LocalDateTime.now()) + "." + extension);
     }
 
-    private List<Command> getAvailableCommands(CommandSender sender) {
-        if (sender.hasPermission("spark")) {
-            return this.commands;
-        }
-        return this.commands.stream()
-                .filter(c -> sender.hasPermission("spark." + c.primaryAlias()))
-                .collect(Collectors.toList());
-    }
-
-    public boolean hasPermissionForAnyCommand(CommandSender sender) {
-        return !getAvailableCommands(sender).isEmpty();
-    }
-
-    public void executeCommand(CommandSender sender, String[] args) {
+    public void executeCommand(Player sender, String[] args) {
         AtomicReference<Thread> executorThread = new AtomicReference<>();
         AtomicReference<Thread> timeoutThread = new AtomicReference<>();
         AtomicBoolean completed = new AtomicBoolean(false);
@@ -388,36 +356,14 @@ public class SparkPlatform {
         });
     }
 
-    private void executeCommand0(CommandSender sender, String[] args) {
+    private void executeCommand0(Player sender, String[] args) {
         CommandResponseHandler resp = new CommandResponseHandler(this, sender);
-        List<Command> commands = getAvailableCommands(sender);
-
-        if (commands.isEmpty()) {
-            resp.replyPrefixed(text("You do not have permission to use this command.", RED));
-            return;
-        }
 
         if (args.length == 0) {
-            resp.replyPrefixed(text()
-                    .append(text("spark", WHITE))
-                    .append(space())
-                    .append(text("v" + getPlugin().getVersion(), GRAY))
-                    .build()
-            );
+            resp.replyPrefixed("[white]spark [gray]v" + getPlugin().getVersion());
 
             String helpCmd = "/" + getPlugin().getCommandName() + " help";
-            resp.replyPrefixed(text()
-                    .color(GRAY)
-                    .append(text("Run "))
-                    .append(text()
-                            .content(helpCmd)
-                            .color(WHITE)
-                            .clickEvent(ClickEvent.runCommand(helpCmd))
-                            .build()
-                    )
-                    .append(text(" to view usage information."))
-                    .build()
-            );
+            resp.replyPrefixed("[gray]Run [white]" + helpCmd + "[gray] to view usage information.");
             return;
         }
 
@@ -426,11 +372,10 @@ public class SparkPlatform {
 
         for (Command command : commands) {
             if (command.aliases().contains(alias)) {
-                resp.setCommandPrimaryAlias(command.primaryAlias());
                 try {
                     command.executor().execute(this, sender, resp, new Arguments(rawArgs, command.allowSubCommand()));
                 } catch (Arguments.ParseException e) {
-                    resp.replyPrefixed(text(e.getMessage(), RED));
+                    resp.replyPrefixed("[red]" + e.getMessage());
                 }
                 return;
             }
@@ -439,41 +384,8 @@ public class SparkPlatform {
         sendUsage(commands, resp);
     }
 
-    public List<String> tabCompleteCommand(CommandSender sender, String[] args) {
-        List<Command> commands = getAvailableCommands(sender);
-        if (commands.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<String> arguments = new ArrayList<>(Arrays.asList(args));
-
-        if (args.length <= 1) {
-            List<String> mainCommands = commands.stream()
-                    .map(Command::primaryAlias)
-                    .collect(Collectors.toList());
-
-            return TabCompleter.create()
-                    .at(0, CompletionSupplier.startsWith(mainCommands))
-                    .complete(arguments);
-        }
-
-        String alias = arguments.remove(0);
-        for (Command command : commands) {
-            if (command.aliases().contains(alias)) {
-                return command.tabCompleter().completions(this, sender, arguments);
-            }
-        }
-
-        return Collections.emptyList();
-    }
-
     private void sendUsage(List<Command> commands, CommandResponseHandler sender) {
-        sender.replyPrefixed(text()
-                .append(text("spark", WHITE))
-                .append(space())
-                .append(text("v" + getPlugin().getVersion(), GRAY))
-                .build()
-        );
+        sender.replyPrefixed("[white]spark [gray]v" + getPlugin().getVersion());
         for (Command command : commands) {
             String usage = "/" + getPlugin().getCommandName() + " " + command.primaryAlias();
 
@@ -484,45 +396,26 @@ public class SparkPlatform {
                 argumentsBySubCommand.forEach((subCommand, arguments) -> {
                     String subCommandUsage = usage + " " + subCommand;
 
-                    sender.reply(text()
-                            .append(text(">", GOLD, BOLD))
-                            .append(space())
-                            .append(text().content(subCommandUsage).color(GRAY).clickEvent(ClickEvent.suggestCommand(subCommandUsage)).build())
-                            .build()
-                    );
+                    sender.reply("[gold]> [gray]" + subCommandUsage);
 
                     for (Command.ArgumentInfo arg : arguments) {
                         if (arg.argumentName().isEmpty()) {
                             continue;
                         }
-                        sender.reply(arg.toComponent("      "));
+                        sender.reply(arg.toString("      "));
                     }
                 });
             } else {
-                sender.reply(text()
-                        .append(text(">", GOLD, BOLD))
-                        .append(space())
-                        .append(text().content(usage).color(GRAY).clickEvent(ClickEvent.suggestCommand(usage)).build())
-                        .build()
-                );
+                sender.reply("[gold]> [gray]" + usage);
 
                 for (Command.ArgumentInfo arg : command.arguments()) {
-                    sender.reply(arg.toComponent("    "));
+                    sender.reply(arg.toString("    "));
                 }
             }
         }
 
-        sender.reply(Component.empty());
-        sender.replyPrefixed(text()
-                .append(text("For full usage information, please go to: "))
-                .append(text()
-                        .content("https://spark.lucko.me/docs/Command-Usage")
-                        .color(WHITE)
-                        .clickEvent(ClickEvent.openUrl("https://spark.lucko.me/docs/Command-Usage"))
-                        .build()
-                )
-                .build()
-        );
+        sender.reply("");
+        sender.replyPrefixed("For full usage information, please go to: [white]https://spark.lucko.me/docs/Command-Usage");
     }
-
 }
+
