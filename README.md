@@ -5,7 +5,7 @@
 </h1>
 
 <h3 align="center">
-  spark is a performance profiler for Minecraft clients, servers and proxies.
+  spark is a performance profiler.
 </h3>
 
 #### Useful Links
