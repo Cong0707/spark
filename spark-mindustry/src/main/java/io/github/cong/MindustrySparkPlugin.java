@@ -3,9 +3,11 @@ package io.github.cong;
 import arc.Core;
 import arc.util.CommandHandler;
 import arc.util.Log;
+import arc.util.Time;
 import me.lucko.spark.common.SparkPlatform;
 import me.lucko.spark.common.SparkPlugin;
 import me.lucko.spark.common.platform.PlatformInfo;
+import me.lucko.spark.common.tick.TickHook;
 import mindustry.Vars;
 import mindustry.entities.EntityGroup;
 import mindustry.gen.Groups;
@@ -71,7 +73,7 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
 
     @Override
     public void executeAsync(Runnable task) {
-        Core.app.post(task);
+        new Thread(task).start();
     }
 
     @Override
@@ -91,5 +93,10 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     @Override
     public PlatformInfo getPlatformInfo() {
         return new MindustryPlatformInfo();
+    }
+
+    @Override
+    public TickHook createTickHook() {
+        return new MindustryTickHook();
     }
 }

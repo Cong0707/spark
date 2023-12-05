@@ -1,23 +1,11 @@
-import org.cadixdev.gradle.licenser.LicenseExtension
-
 plugins {
     id 'com.google.protobuf' version '0.9.1'
-}
-
-license {
-    exclude '**/sampler/async/jfr/**'
 }
 
 repositories{
     mavenCentral()
     maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
     maven{ url 'https://www.jitpack.io' }
-}
-
-extensions.configure(LicenseExtension.class) {
-    it.exclude {
-        it.file.toString().startsWith(buildDir.toString())
-    }
 }
 
 ext{

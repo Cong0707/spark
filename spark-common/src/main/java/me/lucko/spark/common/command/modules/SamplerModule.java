@@ -422,8 +422,7 @@ public class SamplerModule implements CommandModule {
     }
 
     private Sampler.ExportProps getExportProps(SparkPlatform platform, CommandResponseHandler resp, Arguments arguments) {
-        return new Sampler.ExportProps()
-                .creator(new Data(resp.sender().name(), resp.sender().uuid()))
+        Sampler.ExportProps exportProps = new Sampler.ExportProps()
                 .comment(Iterables.getFirst(arguments.stringFlag("comment"), null))
                 .mergeMode(() -> {
                     MethodDisambiguator methodDisambiguator = new MethodDisambiguator();
@@ -432,6 +431,12 @@ public class SamplerModule implements CommandModule {
                             : MergeMode.sameMethod(methodDisambiguator);
                 })
                 .classSourceLookup(() -> ClassSourceLookup.create(platform));
+        if (resp.sender() == null){
+            exportProps.creator(new Data("mindustry server", null));
+        } else {
+            exportProps.creator(new Data(resp.sender().name(), resp.sender().uuid()));
+        }
+        return exportProps;
     }
 
     private static String cmdPrompt(String cmd) {

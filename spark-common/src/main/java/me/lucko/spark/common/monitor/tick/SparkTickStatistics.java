@@ -43,8 +43,8 @@ import java.util.concurrent.TimeUnit;
 public class SparkTickStatistics implements TickHook.Callback, TickReporter.Callback, TickStatistics {
 
     private static final long SEC_IN_NANO = TimeUnit.SECONDS.toNanos(1);
-    private static final int TPS = 20;
-    private static final int TPS_SAMPLE_INTERVAL = 20;
+    private static final int TPS = 60;
+    private static final int TPS_SAMPLE_INTERVAL = 60;
     private static final BigDecimal TPS_BASE = new BigDecimal(SEC_IN_NANO).multiply(new BigDecimal(TPS_SAMPLE_INTERVAL));
 
     private final TpsRollingAverage tps5Sec = new TpsRollingAverage(5);

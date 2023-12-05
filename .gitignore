@@ -3,5 +3,9 @@
 build/
 out/
 run/
+spark-bukkit/
+spark-nukkit/
+spark-velocity4/
+spark-sponge8/
 *.iml
 .DS_Store

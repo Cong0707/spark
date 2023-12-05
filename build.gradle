@@ -1,12 +1,7 @@
-plugins {
-    id 'org.cadixdev.licenser' version '0.6.1' apply false
-}
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'java-library'
-    apply plugin: 'org.cadixdev.licenser'
 
     ext {
         baseVersion = '1.10'

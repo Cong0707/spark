@@ -128,8 +128,12 @@ public final class HeapDumpSummary {
 
     public HeapData toProto(SparkPlatform platform, Player creator) {
         HeapMetadata.Builder metadata = HeapMetadata.newBuilder()
-                .setPlatformMetadata(platform.getPlugin().getPlatformInfo().toData().toProto())
-                .setCreator(new Data(creator.name, creator.uuid()).toProto());
+                .setPlatformMetadata(platform.getPlugin().getPlatformInfo().toData().toProto());
+        if (creator == null){
+            metadata.setCreator(new Data("mindustry server", null).toProto());
+        } else {
+            metadata.setCreator(new Data(creator.name(), creator.uuid()).toProto());
+        }
         try {
             metadata.setPlatformStatistics(platform.getStatisticsProvider().getPlatformStatistics(null, true));
         } catch (Exception e) {

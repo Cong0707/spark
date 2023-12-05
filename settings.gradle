@@ -16,16 +16,6 @@ rootProject.name = 'spark'
 include (
         'spark-api',
         'spark-common',
-        'spark-bukkit',
-        'spark-bungeecord',
-        'spark-velocity',
-        'spark-velocity4',
-        'spark-sponge7',
-        'spark-sponge8',
-        'spark-forge',
-        'spark-fabric',
-        'spark-nukkit',
-        'spark-waterdog',
         'spark-mindustry',
         //'spark-minestom', // disabled until minestom publish their maven artifacts to a proper repo
 )

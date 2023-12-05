@@ -21,6 +21,7 @@
 package me.lucko.spark.common.command;
 
 import arc.util.Log;
+import arc.util.Strings;
 import me.lucko.spark.common.SparkPlatform;
 import mindustry.entities.EntityGroup;
 import mindustry.gen.Groups;
@@ -47,7 +48,7 @@ public class CommandResponseHandler {
 
     public void reply(String message) {
         if (sender == null){
-            Log.info(message);
+            Log.info(Strings.stripColors(message));
         }else{
             this.sender.sendMessage(message);
         }
@@ -56,7 +57,7 @@ public class CommandResponseHandler {
     public void broadcast(String message) {
         if (this.platform.shouldBroadcastResponse()) {
             Groups.player.forEach(player -> player.sendMessage(message));
-            Log.info(message);
+            Log.info(Strings.stripColors(message));
         } else {
             reply(message);
         }
