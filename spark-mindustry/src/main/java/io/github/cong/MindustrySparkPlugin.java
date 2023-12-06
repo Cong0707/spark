@@ -33,7 +33,7 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     @Override
     public void registerServerCommands(CommandHandler handler){
         handler.register("tps", "Show tps dialog.", args -> this.platform.executeCommand(null, new String[]{"tps"}));
-        handler.register("spark", "[args..]","Spark command.", args -> {
+        handler.register("spark", "[args...]","Spark command.", args -> {
 
             StringBuilder result = new StringBuilder();
 
@@ -53,7 +53,7 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     @Override
     public void registerClientCommands(CommandHandler handler){
         handler.<Player>register("tps", "Show tps dialog.", (args, player) -> this.platform.executeCommand(player, new String[]{"tps"}));
-        handler.<Player>register("spark", "[args..]","Spark command.", (args, player) -> {
+        handler.<Player>register("spark", "[args...]","Spark command.", (args, player) -> {
             if (player.admin()) {
 
                 StringBuilder result = new StringBuilder();
