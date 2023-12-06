@@ -3,7 +3,6 @@ package io.github.cong;
 import arc.Core;
 import arc.util.CommandHandler;
 import arc.util.Log;
-import arc.util.Time;
 import me.lucko.spark.common.SparkPlatform;
 import me.lucko.spark.common.SparkPlugin;
 import me.lucko.spark.common.platform.PlatformInfo;
@@ -33,22 +32,20 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     //register commands that run on the server
     @Override
     public void registerServerCommands(CommandHandler handler){
-        handler.register("tps", "Show tps dialog.", args -> {
-            this.platform.executeCommand(null, new String[]{"tps"});
-        });
-        handler.register("spark", "[arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg]","Spark command.", args -> {
-            this.platform.executeCommand(null, args);
-        });
+        handler.register("tps", "Show tps dialog.", args -> this.platform.executeCommand(null, new String[]{"tps"}));
+        handler.register("spark", "[arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg]","Spark command.", args -> this.platform.executeCommand(null, args));
     }
 
     //register commands that player can invoke in-game
     @Override
     public void registerClientCommands(CommandHandler handler){
-        handler.<Player>register("tps", "Show tps dialog.", (args, player) -> {
-            this.platform.executeCommand(player, new String[]{"tps"});
-        });
+        handler.<Player>register("tps", "Show tps dialog.", (args, player) -> this.platform.executeCommand(player, new String[]{"tps"}));
         handler.<Player>register("spark", "[arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg]","Spark command.", (args, player) -> {
-            this.platform.executeCommand(player, args);
+            if (player.admin()) {
+                this.platform.executeCommand(player, args);
+            } else {
+                player.sendMessage("[red]You do not have permission to use this command.");
+            }
         });
     }
 
