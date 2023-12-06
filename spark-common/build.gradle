@@ -24,8 +24,8 @@ dependencies {
     implementation('me.lucko:bytesocks-java-client:1.0-20230828.145440-5') {
         exclude(module: 'slf4j-api')
     }
-    implementation 'com.google.code.gson:gson:2.7'
-    implementation 'com.google.guava:guava:19.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.guava:guava:30.1-jre'
     implementation 'org.checkerframework:checker-qual:3.8.0'
 
     implementation 'org.slf4j:slf4j-api:1.7.32'
