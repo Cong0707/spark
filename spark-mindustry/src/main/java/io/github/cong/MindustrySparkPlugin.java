@@ -94,7 +94,7 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
 
     @Override
     public void executeAsync(Runnable task) {
-        new Thread(task).start();
+        Core.app.post(task);
     }
 
     @Override
