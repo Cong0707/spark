@@ -33,16 +33,40 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     @Override
     public void registerServerCommands(CommandHandler handler){
         handler.register("tps", "Show tps dialog.", args -> this.platform.executeCommand(null, new String[]{"tps"}));
-        handler.register("spark", "[arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg]","Spark command.", args -> this.platform.executeCommand(null, args));
+        handler.register("spark", "[args..]","Spark command.", args -> {
+
+            StringBuilder result = new StringBuilder();
+
+            for (int i = 0; i < args.length; i++) {
+                result.append(args[i]);
+
+                if (i < args.length - 1) {
+                    result.append(" ");
+                }
+            }
+
+            this.platform.executeCommand(null, result.toString().split(" "));
+        });
     }
 
     //register commands that player can invoke in-game
     @Override
     public void registerClientCommands(CommandHandler handler){
         handler.<Player>register("tps", "Show tps dialog.", (args, player) -> this.platform.executeCommand(player, new String[]{"tps"}));
-        handler.<Player>register("spark", "[arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg] [arg]","Spark command.", (args, player) -> {
+        handler.<Player>register("spark", "[args..]","Spark command.", (args, player) -> {
             if (player.admin()) {
-                this.platform.executeCommand(player, args);
+
+                StringBuilder result = new StringBuilder();
+
+                for (int i = 0; i < args.length; i++) {
+                    result.append(args[i]);
+
+                    if (i < args.length - 1) {
+                        result.append(" ");
+                    }
+                }
+
+                this.platform.executeCommand(player, result.toString().split(" "));
             } else {
                 player.sendMessage("[red]You do not have permission to use this command.");
             }
