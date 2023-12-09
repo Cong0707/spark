@@ -5,6 +5,7 @@ import arc.util.CommandHandler;
 import arc.util.Log;
 import me.lucko.spark.common.SparkPlatform;
 import me.lucko.spark.common.SparkPlugin;
+import me.lucko.spark.common.monitor.ping.PlayerPingProvider;
 import me.lucko.spark.common.monitor.tick.TickStatistics;
 import me.lucko.spark.common.platform.PlatformInfo;
 import mindustry.Vars;
@@ -14,6 +15,7 @@ import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.logging.Level;
 
 import static mindustry.Vars.dataDirectory;
@@ -120,5 +122,10 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     @Override
     public TickStatistics createTickStatistics() {
         return new MindustryTickStatistics();
+    }
+
+    @Override
+    public PlayerPingProvider createPlayerPingProvider() {
+        return new MindustryPlayerPingProvider();
     }
 }
