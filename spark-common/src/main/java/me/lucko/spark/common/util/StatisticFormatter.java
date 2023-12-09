@@ -42,7 +42,7 @@ public enum StatisticFormatter {
             color = "[red]";
         }
 
-        return color + (tps > 60.0 ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 60.0);
+        return color + (tps > 100.0 ? "*" : "") + Math.min(Math.round(tps * 100.0) / 100.0, 60.0);
     }
 
     public static String formatTickDurations(DoubleAverageInfo average) {

@@ -5,8 +5,8 @@ import arc.util.CommandHandler;
 import arc.util.Log;
 import me.lucko.spark.common.SparkPlatform;
 import me.lucko.spark.common.SparkPlugin;
+import me.lucko.spark.common.monitor.tick.TickStatistics;
 import me.lucko.spark.common.platform.PlatformInfo;
-import me.lucko.spark.common.tick.TickHook;
 import mindustry.Vars;
 import mindustry.entities.EntityGroup;
 import mindustry.gen.Groups;
@@ -18,6 +18,7 @@ import java.util.logging.Level;
 
 import static mindustry.Vars.dataDirectory;
 
+@SuppressWarnings("unused")
 public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
 
     private SparkPlatform platform;
@@ -117,7 +118,7 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     }
 
     @Override
-    public TickHook createTickHook() {
-        return new MindustryTickHook();
+    public TickStatistics createTickStatistics() {
+        return new MindustryTickStatistics();
     }
 }
