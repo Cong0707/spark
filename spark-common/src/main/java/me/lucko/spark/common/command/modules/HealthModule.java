@@ -206,7 +206,7 @@ public class HealthModule implements CommandModule {
 
     private static void addDetailedMemoryStats(List<String> report, MemoryMXBean memoryMXBean) {
         MemoryUsage nonHeapUsage = memoryMXBean.getNonHeapMemoryUsage();
-        report.add("[gray]>[reset] [gold]Non-heap memory usage:");
+        report.add("[gray]> [gold]Non-heap memory usage:");
         report.add("    [white]" + FormatUtil.formatBytes(nonHeapUsage.getUsed()));
         report.add("");
 
@@ -248,7 +248,7 @@ public class HealthModule implements CommandModule {
                 long packetsPerSec = (long) averages.packetsPerSecond(direction).mean();
 
                 if (detailed || bytesPerSec > 0 || packetsPerSec > 0) {
-                    averagesReport.add("[gray]    [green]" + FormatUtil.formatBytes(bytesPerSec, "green", "/s") +
+                    averagesReport.add("    [green]" + FormatUtil.formatBytes(bytesPerSec, "green", "/s") +
                             "[white] / " + String.format(Locale.ENGLISH, "%,d", packetsPerSec) +
                             " pps [gray](" + interfaceName + " " + direction.abbrev() + ")[gray]");
                 }
@@ -256,7 +256,7 @@ public class HealthModule implements CommandModule {
         }
 
         if (!averagesReport.isEmpty()) {
-            report.add("[gray]>[reset] [gold]Network usage: (system, last 15m)");
+            report.add("[gray]> [gold]Network usage: (system, last 15m)");
             report.addAll(averagesReport);
             report.add("");
         }
@@ -270,7 +270,7 @@ public class HealthModule implements CommandModule {
             return;
         }
 
-        report.add("[gray]>[reset] [gold]Disk usage:");
+        report.add("[gray]> [gold]Disk usage:");
         report.add("    [white]" + FormatUtil.formatBytes(used) + "[gray]/[white]" + FormatUtil.formatBytes(total) + "   [gray](" + FormatUtil.percent(used, total) + ")[gray]");
         report.add("    " + StatisticFormatter.generateDiskUsageDiagram(used, total, 60));
         report.add("");

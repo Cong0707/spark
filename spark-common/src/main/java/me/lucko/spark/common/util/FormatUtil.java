@@ -53,7 +53,7 @@ public enum FormatUtil {
             unit = SIZE_UNITS[sizeIndex] + suffix;
         }
 
-        return "[" + color + "]" + " " + unit;
+        return "[" + color + "]" + value + " " + unit;
     }
 
     public static String formatSeconds(long seconds) {
