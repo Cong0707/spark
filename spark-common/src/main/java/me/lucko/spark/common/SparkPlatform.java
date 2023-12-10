@@ -95,6 +95,7 @@ public class SparkPlatform {
     private Map<String, GarbageCollectorStatistics> startupGcStatistics = ImmutableMap.of();
     private long serverNormalOperationStartTime;
     private final AtomicBoolean enabled = new AtomicBoolean(false);
+    private Boolean color = false;
 
     public SparkPlatform(SparkPlugin plugin) {
         this.plugin = plugin;
@@ -117,7 +118,8 @@ public class SparkPlatform {
                 new HealthModule(),
                 new TickMonitoringModule(),
                 new GcMonitoringModule(),
-                new HeapAnalysisModule()
+                new HeapAnalysisModule(),
+                new ColorModule()
         );
 
         ImmutableList.Builder<Command> commandsBuilder = ImmutableList.builder();
@@ -416,6 +418,18 @@ public class SparkPlatform {
 
         sender.reply("");
         sender.replyPrefixed("For full usage information, please go to: [white]https://spark.lucko.me/docs/Command-Usage");
+    }
+
+    public void enableColor() {
+        this.color = true;
+    }
+
+    public void disableColor() {
+        this.color = false;
+    }
+
+    public Boolean isColorEnable() {
+        return this.color;
     }
 }
 

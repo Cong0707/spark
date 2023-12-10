@@ -15,7 +15,6 @@ import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.logging.Level;
 
 import static mindustry.Vars.dataDirectory;
@@ -82,7 +81,7 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
     }
     @Override
     public Path getPluginDirectory() {
-        return dataDirectory.child("plugins").child("spark").file().toPath();
+        return dataDirectory.child("mods").child("spark").file().toPath();
     }
 
     @Override
