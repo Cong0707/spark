@@ -151,7 +151,7 @@ public enum StatisticFormatter {
     public static String generateDiskUsageDiagram(double used, double max, int length) {
         int usedChars = (int) ((used * length) / max);
         int freeChars = length - usedChars;
-        return "[gray][" + Strings.repeat(BAR_TRUE_CHARACTER, usedChars) + "][yellow]" +
+        return "[gray][" + Strings.repeat(BAR_TRUE_CHARACTER, usedChars) + "[yellow]" +
                 Strings.repeat(BAR_FALSE_CHARACTER, freeChars) + "[gray]]";
     }
 }
