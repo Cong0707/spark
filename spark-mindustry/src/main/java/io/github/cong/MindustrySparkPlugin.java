@@ -15,6 +15,8 @@ import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 
 import java.nio.file.Path;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 
 import static mindustry.Vars.dataDirectory;
@@ -23,6 +25,7 @@ import static mindustry.Vars.dataDirectory;
 public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
 
     private SparkPlatform platform;
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
 
     //called when game initializes
     @Override
@@ -96,7 +99,7 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
 
     @Override
     public void executeAsync(Runnable task) {
-        Core.app.post(task);
+        executor.execute(task);
     }
 
     @Override
