@@ -1,6 +1,5 @@
 package io.github.cong;
 
-import arc.util.Log;
 import arc.util.Time;
 import me.lucko.spark.common.monitor.ping.PlayerPingProvider;
 import mindustry.Vars;
@@ -16,7 +15,7 @@ public class MindustryPlayerPingProvider implements PlayerPingProvider {
     MindustryPlayerPingProvider() {
         Vars.net.handleServer(PingCallPacket.class, (netConnection, pingCallPacket) -> {
             pingMap.put(
-                    netConnection.player.name,
+                    netConnection.player.uuid(),
                     (int) (Time.timeSinceMillis(pingCallPacket.time) * 2)//go and back
             );
         });
