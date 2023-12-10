@@ -38,9 +38,7 @@ public class MindustryTickStatistics implements TickStatistics {
         return true;
     }
 
-    MindustryTickStatistics() {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-
+    MindustryTickStatistics(ScheduledExecutorService executor) {
         Runnable tpsTask = () -> {
             if (!Vars.state.isPlaying()) {
                 return;

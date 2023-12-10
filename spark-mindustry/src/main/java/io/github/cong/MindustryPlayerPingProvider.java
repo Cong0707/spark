@@ -1,17 +1,20 @@
 package io.github.cong;
 
 import arc.func.Cons2;
+import arc.struct.ObjectMap;
 import arc.util.Log;
 import arc.util.Time;
 import me.lucko.spark.common.monitor.ping.PlayerPingProvider;
 import mindustry.Vars;
 import mindustry.gen.PingCallPacket;
 import mindustry.net.NetConnection;
-import arc.struct.ObjectMap;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 @SuppressWarnings("unchecked")
 public class MindustryPlayerPingProvider implements PlayerPingProvider {
@@ -27,7 +30,8 @@ public class MindustryPlayerPingProvider implements PlayerPingProvider {
         };
         return got != null ? got : def;
     }
-    MindustryPlayerPingProvider() {
+
+    MindustryPlayerPingProvider(ScheduledExecutorService executor) {
         Class<?> clazz = mindustry.net.Net.class;
         Field field;
         try {
@@ -39,13 +43,17 @@ public class MindustryPlayerPingProvider implements PlayerPingProvider {
         }
         Cons2<NetConnection, Object> old = getPacketHandle(PingCallPacket.class);
         Vars.net.handleServer(PingCallPacket.class, (netConnection, pingCallPacket) -> {
-            pingMap.put(
-                    netConnection.player.uuid(),
-                    (int) (Time.timeSinceMillis(pingCallPacket.time))
+            executor.execute(() -> {
+                    pingMap.put(
+                            netConnection.player.uuid(),
+                            (int) (Time.timeSinceMillis(pingCallPacket.time))
+                    );
+                    old.get(netConnection, pingCallPacket);
+                }
             );
-            old.get(netConnection, pingCallPacket);
         });
     }
+
     @Override
     public Map<String, Integer> poll() {
         return pingMap;

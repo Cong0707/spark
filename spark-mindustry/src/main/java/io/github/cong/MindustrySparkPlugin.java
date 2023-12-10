@@ -25,7 +25,7 @@ import static mindustry.Vars.dataDirectory;
 public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
 
     private SparkPlatform platform;
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(16);
 
     //called when game initializes
     @Override
@@ -123,11 +123,11 @@ public class MindustrySparkPlugin extends Plugin implements SparkPlugin {
 
     @Override
     public TickStatistics createTickStatistics() {
-        return new MindustryTickStatistics();
+        return new MindustryTickStatistics(executor);
     }
 
     @Override
     public PlayerPingProvider createPlayerPingProvider() {
-        return new MindustryPlayerPingProvider();
+        return new MindustryPlayerPingProvider(executor);
     }
 }
